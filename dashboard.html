@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ru" class="bg-black">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewTrade - Личный кабинет</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-gold { background-color: #D4AF37; }
+        .text-gold { color: #D4AF37; }
+        .border-gold { border-color: #D4AF37; }
+        .skeleton {
+            background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <div class="flex min-h-screen">
+        <!-- Сайдбар -->
+        <aside class="w-64 bg-gray-900 p-6 hidden md:block">
+            <div class="text-center mb-8">
+                <div class="w-24 h-24 rounded-full bg-gray-800 mx-auto mb-4 flex items-center justify-center text-3xl" id="user-avatar"></div>
+                <h3 class="text-xl font-bold" id="user-name">Загрузка...</h3>
+                <p class="text-green-400 text-sm" id="user-vip"></p>
+            </div>
+            
+            <nav class="space-y-2">
+                <a href="#" class="block p-3 bg-gray-800 rounded hover:bg-gray-700 transition">Дашборд</a>
+                <a href="#deposit" class="block p-3 hover:bg-gray-700 rounded transition">Пополнение</a>
+                <a href="#withdraw" class="block p-3 hover:bg-gray-700 rounded transition">Вывод</a>
+                <a href="#referrals" class="block p-3 hover:bg-gray-700 rounded transition">Рефералы</a>
+                <a href="#transactions" class="block p-3 hover:bg-gray-700 rounded transition">Транзакции</a>
+                <button id="logout-btn" class="w-full p-3 text-red-400 hover:bg-gray-700 rounded transition text-left">Выйти</button>
+            </nav>
+        </aside>
+        
+        <!-- Основной контент -->
+        <main class="flex-1 p-4 md:p-8">
+            <!-- Мобильное меню -->
+            <div class="md:hidden mb-4">
+                <button id="mobile-menu-btn" class="p-2 bg-gray-800 rounded">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Баланс -->
+            <section class="bg-gray-900 rounded-xl p-6 mb-6">
+                <h2 class="text-2xl font-bold mb-4">Ваш баланс</h2>
+                <div class="flex items-end mb-2">
+                    <span class="text-4xl font-bold text-gold mr-2">$<span id="user-balance" class="skeleton w-32 h-10 inline-block"></span></span>
+                    <span class="text-xl">USDT</span>
+                </div>
+                <p class="text-green-400">Ежедневный доход: <span id="daily-income" class="skeleton w-20 h-6 inline-block"></span></p>
+            </section>
+
+            <!-- Пополнение -->
+            <section id="deposit" class="bg-gray-900 rounded-xl p-6 mb-6">
+                <h2 class="text-2xl font-bold mb-4">Пополнение USDT (TRC20)</h2>
+                <div>
+                    <p class="mb-2">Адрес кошелька:</p>
+                    <div class="flex mb-4">
+                        <input type="text" value="TSJHZ4JnvNTp4oVTokmZP6UFGAn2zfMJsC" 
+                               class="flex-grow p-3 bg-gray-800 rounded-l focus:outline-none" readonly>
+                        <button id="copy-wallet" class="bg-gold px-4 py-3 rounded-r text-black font-bold hover:bg-yellow-600 transition">Копировать</button>
+                    </div>
+                    <p class="text-sm text-gray-400">Минимум: 100 USDT. После отправки средств баланс обновится автоматически в течение 10 минут.</p>
+                </div>
+            </section>
+
+            <!-- Рефералы -->
+            <section id="referrals" class="bg-gray-900 rounded-xl p-6 mb-6">
+                <h2 class="text-2xl font-bold mb-4">Реферальная программа</h2>
+                <div class="mb-4">
+                    <p class="mb-2">Ваша реферальная ссылка:</p>
+                    <div class="flex">
+                        <input type="text" id="ref-link" class="flex-grow p-3 bg-gray-800 rounded-l focus:outline-none" readonly>
+                        <button id="copy-ref" class="bg-green-500 px-4 py-3 rounded-r text-white font-bold hover:bg-green-600 transition">Копировать</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gray-800 p-4 rounded">
+                        <p class="text-gray-400">Приглашено</p>
+                        <p class="text-2xl font-bold" id="ref-count">0</p>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded">
+                        <p class="text-gray-400">Заработано</p>
+                        <p class="text-2xl font-bold" id="ref-earned">0 USDT</p>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded">
+                        <p class="text-gray-400">Ваш уровень</p>
+                        <p class="text-2xl font-bold" id="ref-level">1</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Транзакции -->
+            <section id="transactions" class="bg-gray-900 rounded-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Последние транзакции</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left border-b border-gray-700">
+                                <th class="pb-2">Дата</th>
+                                <th class="pb-2">Тип</th>
+                                <th class="pb-2">Сумма</th>
+                                <th class="pb-2">Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-list">
+                            <tr>
+                                <td colspan="4" class="py-4 text-center text-gray-500">Загрузка транзакций...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc,
+            collection,
+            query,
+            where,
+            getDocs
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDoRXQFTkxT_YzwhBDg1xl4W6RjI38-uZI",
+            authDomain: "newtrade-7d148.firebaseapp.com",
+            projectId: "newtrade-7d148",
+            storageBucket: "newtrade-7d148.appspot.com",
+            messagingSenderId: "242022210306",
+            appId: "1:242022210306:web:6443882714fbb05137c01b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Выход из системы
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Ошибка выхода:', error);
+            }
+        });
+
+        // Копирование кошелька
+        document.getElementById('copy-wallet').addEventListener('click', () => {
+            const walletInput = document.querySelector('input[value^="TSJHZ4JnvNTp4oVTokmZP6UFGAn2zfMJsC"]');
+            walletInput.select();
+            document.execCommand('copy');
+            alert('Кошелек скопирован!');
+        });
+
+        // Копирование реферальной ссылки
+        document.getElementById('copy-ref').addEventListener('click', () => {
+            const refInput = document.getElementById('ref-link');
+            refInput.select();
+            document.execCommand('copy');
+            alert('Реферальная ссылка скопирована!');
+        });
+
+        // Загрузка данных пользователя
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                
+                // Отображение данных
+                document.getElementById('user-name').textContent = userData.name;
+                document.getElementById('user-avatar').textContent = userData.name.charAt(0);
+                document.getElementById('user-balance').textContent = userData.balance?.toFixed(2) || '0.00';
+                document.getElementById('user-balance').classList.remove('skeleton');
+                document.getElementById('user-vip').textContent = `VIP ${userData.vipLevel || 1}`;
+                document.getElementById('ref-link').value = `${window.location.origin}/auth.html?ref=${userData.refCode}`;
+                
+                // Расчет дохода
+                const dailyIncome = calculateDailyIncome(userData.vipLevel || 1, userData.balance || 0);
+                document.getElementById('daily-income').textContent = `$${dailyIncome.toFixed(2)}`;
+                document.getElementById('daily-income').classList.remove('skeleton');
+                
+                // Загрузка рефералов
+                loadReferrals(userData.refCode);
+                
+                // Загрузка транзакций
+                loadTransactions(user.uid);
+            }
+        });
+
+        function calculateDailyIncome(vipLevel, balance) {
+            const rates = { 1: 1.2, 2: 1.5, 3: 1.8, 4: 2.1, 5: 2.4, 6: 2.7, 7: 3.0 };
+            return (balance * rates[vipLevel]) / 100;
+        }
+
+        async function loadReferrals(refCode) {
+            const q = query(collection(db, "users"), where("referredBy", "==", refCode));
+            const querySnapshot = await getDocs(q);
+            
+            document.getElementById('ref-count').textContent = querySnapshot.size;
+            document.getElementById('ref-earned').textContent = (querySnapshot.size * 10).toFixed(2);
+        }
+
+        async function loadTransactions(userId) {
+            const q = query(collection(db, "transactions"), where("userId", "==", userId));
+            const querySnapshot = await getDocs(q);
+            
+            const tbody = document.getElementById('transactions-list');
+            tbody.innerHTML = '';
+            
+            if (querySnapshot.empty) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="py-4 text-center text-gray-500">Нет транзакций</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-700 hover:bg-gray-800';
+                tr.innerHTML = `
+                    <td class="py-3">${data.date?.toDate().toLocaleString() || 'N/A'}</td>
+                    <td>${data.type || 'N/A'}</td>
+                    <td class="${data.type === 'deposit' ? 'text-green-400' : 'text-red-400'}">${data.amount || 0} USDT</td>
+                    <td>${data.status || 'completed'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Мобильное меню
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.querySelector('aside').classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+public/
+├── index.html          # Главная страница
+├── auth.html           # Авторизация/Регистрация
+├── dashboard.html      # Личный кабинет
+├── admin.html          # Админ-панель
+├── css/
+│   └── styles.css      # Кастомные стили (золото/черный/зеленый)
+├── js/
+│   ├── firebase.js     # Инициализация Firebase
+│   ├── auth.js         # Логика авторизации
+│   ├── dashboard.js    # Логика ЛК
+│   ├── admin.js        # Логика админки
+│   └── tron.js         # Работа с USDT TRC20
+└── images/             # Логотипы, иконки

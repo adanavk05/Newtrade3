@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru" class="bg-black">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewTrade - Вход</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-gold { background-color: #D4AF37; }
+        .text-gold { color: #D4AF37; }
+        .tab-button.active { color: #D4AF37; border-bottom: 2px solid #D4AF37; }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-gray-900 rounded-xl overflow-hidden shadow-lg">
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-800">
+                <button id="login-tab" class="tab-button active py-4 px-6 font-medium">Вход</button>
+                <button id="register-tab" class="tab-button py-4 px-6 font-medium">Регистрация</button>
+            </div>
+            
+            <!-- Форма входа -->
+            <form id="login-form" class="p-6 space-y-6">
+                <div>
+                    <label for="login-email" class="block mb-2">Email</label>
+                    <input type="email" id="login-email" class="w-full p-3 bg-gray-800 rounded focus:ring-2 focus:ring-gold">
+                </div>
+                <div>
+                    <label for="login-password" class="block mb-2">Пароль</label>
+                    <input type="password" id="login-password" class="w-full p-3 bg-gray-800 rounded focus:ring-2 focus:ring-gold">
+                </div>
+                <button type="submit" class="w-full bg-gold py-3 rounded text-black font-bold hover:bg-yellow-600 transition">Войти</button>
+                <div class="text-center">
+                    <a href="#" id="reset-password" class="text-green-400 hover:underline">Забыли пароль?</a>
+                </div>
+                <div class="flex items-center my-4">
+                    <div class="flex-grow border-t border-gray-700"></div>
+                    <span class="px-4 text-gray-500">Или</span>
+                    <div class="flex-grow border-t border-gray-700"></div>
+                </div>
+                <button id="google-login" type="button" class="w-full bg-white py-3 rounded flex items-center justify-center hover:bg-gray-200 transition">
+                    <img src="https://www.google.com/favicon.ico" class="w-6 h-6 mr-2">
+                    Войти через Google
+                </button>
+            </form>
+            
+            <!-- Форма регистрации -->
+            <form id="register-form" class="p-6 space-y-6 hidden">
+                <div>
+                    <label for="register-name" class="block mb-2">Имя</label>
+                    <input type="text" id="register-name" class="w-full p-3 bg-gray-800 rounded focus:ring-2 focus:ring-gold">
+                </div>
+                <div>
+                    <label for="register-email" class="block mb-2">Email</label>
+                    <input type="email" id="register-email" class="w-full p-3 bg-gray-800 rounded focus:ring-2 focus:ring-gold">
+                </div>
+                <div>
+                    <label for="register-password" class="block mb-2">Пароль</label>
+                    <input type="password" id="register-password" class="w-full p-3 bg-gray-800 rounded focus:ring-2 focus:ring-gold">
+                </div>
+                <div>
+                    <label for="register-ref" class="block mb-2">Реферальный код (необязательно)</label>
+                    <input type="text" id="register-ref" class="w-full p-3 bg-gray-800 rounded focus:ring-2 focus:ring-gold">
+                </div>
+                <button type="submit" class="w-full bg-gold py-3 rounded text-black font-bold hover:bg-yellow-600 transition">Создать аккаунт</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            sendPasswordResetEmail
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDoRXQFTkxT_YzwhBDg1xl4W6RjI38-uZI",
+            authDomain: "newtrade-7d148.firebaseapp.com",
+            projectId: "newtrade-7d148",
+            storageBucket: "newtrade-7d148.appspot.com",
+            messagingSenderId: "242022210306",
+            appId: "1:242022210306:web:6443882714fbb05137c01b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Переключение между вкладками
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                if (button.id === 'login-tab') {
+                    document.getElementById('login-form').classList.remove('hidden');
+                    document.getElementById('register-form').classList.add('hidden');
+                } else {
+                    document.getElementById('login-form').classList.add('hidden');
+                    document.getElementById('register-form').classList.remove('hidden');
+                }
+            });
+        });
+
+        // Вход через Google
+        document.getElementById('google-login').addEventListener('click', async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
+        });
+
+        // Регистрация
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = e.target['register-email'].value;
+            const password = e.target['register-password'].value;
+            const name = e.target['register-name'].value;
+            const refCode = e.target['register-ref'].value;
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, "users", userCredential.user.uid), {
+                    email,
+                    name,
+                    balance: 0,
+                    vipLevel: 1,
+                    refCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
+                    referredBy: refCode || null,
+                    createdAt: serverTimestamp()
+                });
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                alert('Ошибка регистрации: ' + error.message);
+            }
+        });
+
+        // Вход через email
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = e.target['login-email'].value;
+            const password = e.target['login-password'].value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                alert('Ошибка входа: ' + error.message);
+            }
+        });
+
+        // Сброс пароля
+        document.getElementById('reset-password').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = prompt('Введите ваш email:');
+            if (email) {
+                try {
+                    await sendPasswordResetEmail(auth, email);
+                    alert('Письмо для сброса пароля отправлено!');
+                } catch (error) {
+                    alert('Ошибка: ' + error.message);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

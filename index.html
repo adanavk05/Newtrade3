@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru" class="bg-black">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewTrade - Автоматизированная торговля</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        .bg-gold { background-color: #D4AF37; }
+        .text-gold { color: #D4AF37; }
+        .border-gold { border-color: #D4AF37; }
+        .hover-scale:hover { transform: scale(1.02); }
+        @keyframes pulse-gold {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-gold {
+            animation: pulse-gold 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-black text-white font-sans">
+    <!-- Навигация -->
+    <nav class="bg-black py-4 border-b border-gold sticky top-0 z-50">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="text-gold font-bold text-2xl font-['Playfair_Display']">NEWTRADE</div>
+            <div>
+                <a href="auth.html" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition duration-300 transform hover:scale-105">Войти</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Герой-секция -->
+    <section class="py-20 text-center bg-gradient-to-b from-black to-gray-900">
+        <div class="container mx-auto px-4">
+            <h1 class="text-5xl font-bold mb-4 animate-pulse-gold">АВТОМАТИЗИРОВАННАЯ <span class="text-gold">ТОРГОВЛЯ</span></h1>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">Наши алгоритмы обеспечивают стабильный доход с помощью искусственного интеллекта и анализа рынка 24/7</p>
+            <a href="auth.html" class="bg-gold hover:bg-yellow-600 px-8 py-3 rounded-full text-black font-bold transition duration-300 inline-block transform hover:scale-105 shadow-lg shadow-yellow-500/20">
+                НАЧАТЬ ЗАРАБАТЫВАТЬ
+            </a>
+        </div>
+    </section>
+
+    <!-- VIP Уровни -->
+    <section class="py-16 bg-gradient-to-b from-gray-900 to-black">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gold">VIP УРОВНИ ДОХОДНОСТИ</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="vip-levels">
+                <!-- Уровни будут загружены через JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Топ криптовалют -->
+    <section class="py-16 bg-black">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gold">ТОП-10 КРИПТОВАЛЮТ</h2>
+            <div class="bg-gray-900 rounded-xl p-6 shadow-lg shadow-gold/10">
+                <div id="crypto-charts" class="min-h-64 flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold mb-4"></div>
+                        <p>Загрузка данных о криптовалютах...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="bg-gray-900 py-8 border-t border-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-gold font-bold text-2xl font-['Playfair_Display'] mb-4 md:mb-0">NEWTRADE</div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-gold transition">Политика конфиденциальности</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition">Условия использования</a>
+                    <a href="#" class="text-gray-400 hover:text-gold transition">Поддержка</a>
+                </div>
+            </div>
+            <div class="mt-8 text-center text-gray-500 text-sm">
+                © 2023 NewTrade. Все права защищены.
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        // Инициализация Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDoRXQFTkxT_YzwhBDg1xl4W6RjI38-uZI",
+            authDomain: "newtrade-7d148.firebaseapp.com",
+            projectId: "newtrade-7d148",
+            storageBucket: "newtrade-7d148.appspot.com",
+            messagingSenderId: "242022210306",
+            appId: "1:242022210306:web:6443882714fbb05137c01b",
+            measurementId: "G-XXXXXXXXXX"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+        // Загрузка VIP уровней
+        document.addEventListener('DOMContentLoaded', () => {
+            const vipLevels = [
+                { 
+                    level: 1, 
+                    percent: 1.2, 
+                    minDeposit: 100, 
+                    minRefs: 0,
+                    refDeposit: 0,
+                    description: "Стартовый уровень для новых инвесторов",
+                    benefits: ["Доступ к базовым стратегиям", "Поддержка 24/7", "Ежедневные отчеты"]
+                },
+                { 
+                    level: 2, 
+                    percent: 1.5, 
+                    minDeposit: 500, 
+                    minRefs: 5,
+                    refDeposit: 100,
+                    description: "Для активных инвесторов",
+                    benefits: ["Расширенные стратегии", "Персональный менеджер", "Еженедельный анализ"]
+                },
+                { 
+                    level: 3, 
+                    percent: 1.8, 
+                    minDeposit: 1000, 
+                    minRefs: 10,
+                    refDeposit: 100,
+                    description: "Профессиональный уровень",
+                    benefits: ["Эксклюзивные сигналы", "Приоритетная поддержка", "Детальная аналитика"]
+                },
+                { 
+                    level: 4, 
+                    percent: 2.1, 
+                    minDeposit: 2500, 
+                    minRefs: 15,
+                    refDeposit: 200,
+                    description: "Премиум статус",
+                    benefits: ["VIP стратегии", "Индивидуальные решения", "Ежемесячные бонусы"]
+                },
+                { 
+                    level: 5, 
+                    percent: 2.4, 
+                    minDeposit: 5000, 
+                    minRefs: 20,
+                    refDeposit: 200,
+                    description: "Элитный инвестор",
+                    benefits: ["Эксклюзивные инструменты", "Прямой доступ к аналитикам", "Персональные предложения"]
+                },
+                { 
+                    level: 6, 
+                    percent: 2.7, 
+                    minDeposit: 10000, 
+                    minRefs: 25,
+                    refDeposit: 300,
+                    description: "VIP-клиент",
+                    benefits: ["Премиум аналитика", "Индивидуальные стратегии", "Эксклюзивные мероприятия"]
+                },
+                { 
+                    level: 7, 
+                    percent: 3.0, 
+                    minDeposit: 25000, 
+                    minRefs: 30,
+                    refDeposit: 500,
+                    description: "Премиум VIP",
+                    benefits: ["Максимальная доходность", "Персональный аналитик", "Эксклюзивные условия"]
+                }
+            ];
+
+            const container = document.getElementById('vip-levels');
+            
+            vipLevels.forEach(level => {
+                const levelCard = document.createElement('div');
+                levelCard.className = `bg-gray-800 p-6 rounded-xl hover-scale transition duration-300 border border-transparent hover:border-gold relative overflow-hidden ${level.level > 4 ? 'shadow-lg shadow-gold/10' : ''}`;
+                
+                if (level.level === 7) {
+                    levelCard.innerHTML = `
+                        <div class="absolute top-0 right-0 bg-gold text-black px-3 py-1 text-xs font-bold">
+                            ЛУЧШИЙ ВЫБОР
+                        </div>
+                    `;
+                }
+
+                levelCard.innerHTML += `
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-gold mb-1">VIP ${level.level}</h3>
+                                <p class="text-green-400 text-3xl font-bold">${level.percent}% <span class="text-sm font-normal">в день</span></p>
+                            </div>
+                            ${level.level > 4 ? '<span class="bg-yellow-900 text-yellow-200 text-xs px-2 py-1 rounded">PREMIUM</span>' : ''}
+                        </div>
+
+                        <div class="mb-5">
+                            <p class="text-sm text-gray-300 mb-3">${level.description}</p>
+                            <div class="space-y-2">
+                                ${level.benefits.map(benefit => `
+                                    <div class="flex items-start">
+                                        <svg class="flex-shrink-0 w-4 h-4 mt-1 mr-2 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-sm">${benefit}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 rounded-lg p-3 text-sm">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">Мин. депозит:</span>
+                                <span class="font-medium">$${level.minDeposit}</span>
+                            </div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-400">Рефералов:</span>
+                                <span class="font-medium">${level.minRefs}+</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Депозит рефов:</span>
+                                <span class="font-medium">$${level.refDeposit}+</span>
+                            </div>
+                        </div>
+
+                        ${level.level === 1 ? `
+                            <button class="w-full mt-4 bg-gold hover:bg-yellow-600 text-black font-bold py-2 rounded-lg transition duration-300">
+                                Начать сейчас
+                            </button>
+                        ` : `
+                            <button class="w-full mt-4 border border-gold text-gold hover:bg-gold hover:text-black font-bold py-2 rounded-lg transition duration-300">
+                                Получить статус
+                            </button>
+                        `}
+                    </div>
+                `;
+
+                container.appendChild(levelCard);
+            });
+
+            // Загрузка данных о криптовалютах
+            setTimeout(() => {
+                document.getElementById('crypto-charts').innerHTML = `
+                    <div class="w-full">
+                        <p class="text-center text-gray-400 mb-4">Реальные данные будут загружаться через CoinGecko API</p>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            ${['BTC', 'ETH', 'BNB', 'XRP', 'SOL', 'ADA', 'DOGE', 'DOT', 'MATIC', 'SHIB'].map(crypto => `
+                                <div class="bg-gray-800 p-3 rounded-lg text-center hover:bg-gray-700 transition">
+                                    <div class="text-gold font-bold mb-1">${crypto}</div>
+                                    <div class="text-green-400 text-sm">+${(Math.random() * 5).toFixed(2)}%</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
