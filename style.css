@@ -1,0 +1,44 @@
+/* Кастомные цвета */
+@layer utilities {
+  .bg-gold { background-color: #D4AF37; }
+  .text-gold { color: #D4AF37; }
+  .border-gold { border-color: #D4AF37; }
+}
+
+/* Анимации */
+.hover-scale {
+  transition: transform 0.3s;
+}
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Табы */
+.tab-button {
+  position: relative;
+}
+.tab-button.active {
+  color: #D4AF37;
+}
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #D4AF37;
+}
+
+/* Скелетон для загрузки */
+.skeleton {
+  background-color: #1a1a1a;
+  background-image: linear-gradient(90deg, #1a1a1a, #2a2a2a, #1a1a1a);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
